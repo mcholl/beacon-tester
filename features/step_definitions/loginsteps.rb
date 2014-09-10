@@ -1,7 +1,7 @@
 
 Given(/^I am on the home page at "(.*?)"$/) do |page_name|
 	visit page_name
-	sleep 15
+	sleep 5
 end
 
 When(/^I click on a "(.*?)" link$/) do |element|
