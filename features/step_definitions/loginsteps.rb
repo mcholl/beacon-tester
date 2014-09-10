@@ -42,6 +42,3 @@ When(/^I select "(.*?)" from the "(.*?)" dropdown$/) do |element_valu, element_i
 
 end
 
-When(/^I pause to examine variables$/) do
-	require "debug"
-end

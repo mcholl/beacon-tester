@@ -28,10 +28,12 @@ Beacon Tester:
 		-	There could be a beacon call to a url of xxx [optional] @done(2014-09-10)
 
 		Parameters:
+		-	If the beacon call defining an optional service does not exist, skip the parameter tests
 		-	Parameter matches value @done(2014-09-10)
 		-	Parameter contains value @done(2014-09-10)
 		-	Parameter matches regular expression
 		-	Parameter has a value of {string, numeric, date}
+		-	Be able to specify "a XXX parameter" or "an XXX parameter"
 
 		-	Omniture specific parameters:
 			- RSID
