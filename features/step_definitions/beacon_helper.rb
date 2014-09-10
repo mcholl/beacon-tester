@@ -1,82 +1,3 @@
-Given(/^I store a screenshot as "(.*?)"$/) do |filename|
-	save_screenshot(filename)
-end
-
-When(/^I store a har file as "(.*?)"$/) do |filename|
-  saveHarFile(filename)
-end
-
-When(/^I collect all outgoing network traffic requests for (\d+) milliseconds$/) do |timeout_ms|
-	page.driver.timeout = timeout_ms.to_f
-	step "I collect all outgoing network traffic requests"
-end
-
-When(/^I collect all outgoing network traffic requests$/) do
-	captureTraffic()
-	puts "#{page.driver.network_traffic.length} requests made."
-
-	# page.driver.clear_network_traffic
-end
-
-When(/^I print out the list of urls found$/) do
-	#puts @beacons
-  @beacons.each do |beacon|
-	  #Iterate through the beacons to find any and all calls to the passed site and.or slug
-	  puts "#{beacon["service"]}\t #{beacon["status"]}\t #{beacon["url"]}"
-  end
-end
-
-When(/^I print out the list of services found$/) do
-	# puts @services
-	@services.each do |service|
-		#Iterate through the beacons to find any and all calls to the passed site and.or slug
-		puts "#{service["name"]}:\t 	 #{service["url"]}  "
-		puts "\t\tDOMAIN = #{service["domain"]}  "
-			
-		puts "\t\tSLUG = #{service["slug"]}  " if ! service["slug"].nil?
-		puts "\t\tQUERYSTRING = #{service["querystring"]} " if ! service["querystring"].nil?
-
-		if ! service["params"].nil?
-			service["params"].each do |param|
-				puts "\t\t\tParameter #{param[0]} =>  #{param[1]}"
-			end
-		end
-	end
-end
-
-Then(/^there could be a "(.*?)" beacon call to "(.*?)"$/) do |service_name, service_url|
-	if !findBeacon?(service_name, service_url)
-		puts "Warning: There is no #{service_name} url of #{service_url}"
-	end
-end
-
-Then(/^there is a "(.*?)" beacon call to "(.*?)"$/) do |service_name, service_url|
-	if !findBeacon?(service_name, service_url) 
-		msg = "#{service_name} Beacon Not Found, using #{service_url}"
-		puts msg
-		step "I print out the list of urls found"
-		# raise msg
-	end
-end
-
-Then(/^"(.*?)" will have a "(.*?)" parameter with a value of "(.*?)"$/) do |service_name, parameter, valu|
-	#Verify the beacon service has been named
-	service = getBeacon(service_name)
-	if service == nil
-		msg = "No service named #{service_name} has been found yet"
-		print msg
-		step "I print out the list of services found"
-		raise msg
-	end
-
-	param = getParam(service, parameter)
-	if param[0].nil?
-		  raise "#{service_name} exists but has no parameter #{param}"
-	end
-	if param[1] != valu
-		raise "#{service_name} has a parameter #{param} but the value was '#{param[1]}' when '#{valu}' was expected."
-	end
-end
 
 def captureTraffic()
 	@beacons = []	#all traffic stored here
@@ -171,12 +92,47 @@ def getBeacon(service_name)
 	return nil
 end
 
+def displayServices()
+	@services.each do |service|
+		#Iterate through the beacons to find any and all calls to the passed site and.or slug
+		puts "#{service["name"]}:\t 	 #{service["url"]}  "
+		puts "\t\tDOMAIN = #{service["domain"]}  "
+			
+		puts "\t\tSLUG = #{service["slug"]}  " if ! service["slug"].nil?
+		puts "\t\tQUERYSTRING = #{service["querystring"]} " if ! service["querystring"].nil?
+
+		if ! service["params"].nil?
+			service["params"].each do |param|
+				puts "\t\t\tParameter #{param[0]} =>  #{param[1]}"
+			end
+		end
+	end
+end
+
 def getParam(service, parameter)
 	service["params"].each do |param|
 		if param[0].downcase == parameter.downcase
 			return param
 		end
 	end
-
+	
 	return [nil, nil]
 end
+
+def getParamValue(service_name, parameter)
+	if service == nil
+		msg = "No service named #{service_name} has been found yet"
+		print msg
+		step "I print out the list of services found"
+	end
+	service.should_not be nil
+
+	param = getParam(service, parameter)
+	if param[0].nil?
+		  raise "#{service_name} exists but has no parameter #{param}"
+	end
+	param[0].should_not be nil
+
+	return param[1]
+end
+

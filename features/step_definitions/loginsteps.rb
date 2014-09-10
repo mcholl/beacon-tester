@@ -37,7 +37,7 @@ When(/^I select "(.*?)" from the "(.*?)" dropdown$/) do |element_valu, element_i
 	# js = "var myField = document.getElementById('gender');myField.options.selectedIndex=1"
 	# txt=page.execute_script(js)
 
-#	select("M", :from => 'gender', :visible => false)
+	#	select("M", :from => 'gender', :visible => false)
 	select(element_valu, :from => element_id, :visible => false)
 
 end

@@ -1,0 +1,44 @@
+Beacon Tester:
+
+
+	Define basic Scenarios to be run:
+		-	All Front Pages have the basic beacons: Omniture, Chartbeat, Double_Click, Comscrore
+			This scenario just hits the home page of each site an verifies the basic analytic tags all fire
+				- Implement a Values Table:
+					- Setup a table for 5 papers with default beacons
+					-	See taht Cucumber executes it 5 times
+
+		-	Subscription pages should have the following beacons: Marin
+			This scenario (which was the actual original requirement) verifies that a user can subscribe to the paper, and that the Marin Tag fires at the end of it with the correct parameters
+
+		-	Marketing tags on each section front for selected papers: TBD
+			Here we need a matrix of marketing tag and the pages on which we expect them.  It will grow over time
+
+	Be able to collected network traffic:
+		- with a timeout @done(2014-09-10)
+		-	optionally with screenshots @done(2014-09-10)
+		-	and be able to save a HAR file
+		-	See what happens with a tag that does a POST. Per Rob, most of them are Gets, but we probably need POSTs too.
+
+	Be able to support the following paramater tests:
+		Beacon Calls:
+		- There will be a beacon call to a url of xxx	[required] @done(2014-09-10)
+		-	There will NOT be a call to a url of xxx	[excluded]
+		-	There will be n beacon calls to a url of xxx	[required n or more calls]
+		-	There could be a beacon call to a url of xxx [optional] @done(2014-09-10)
+
+		Parameters:
+		-	Parameter matches value @done(2014-09-10)
+		-	Parameter contains value @done(2014-09-10)
+		-	Parameter matches regular expression
+		-	Parameter has a value of {string, numeric, date}
+
+		-	Omniture specific parameters:
+			- RSID
+			-	variable expansion
+
+	Be able to monitor the tags consistently:
+	-	Set up a Jenkins job to execute tests and notify XXX of any failures
+
+	Document it:
+
