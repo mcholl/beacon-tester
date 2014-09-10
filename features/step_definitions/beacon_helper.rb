@@ -71,11 +71,15 @@ def parseBeaconDetails(rawurl)
 	  	 #parse the querystring at each "&", create a hash of key=value
 	  	service["querystring"].lines(separator="&").each do |paramline|
 	  		v = paramline.split("=")
-	  		if v[1].slice(-1) == "&"
-	  			v[1] = v[1][0..-2] 
-	  		end
-	  		v[1] = URI.encode_www_form_component(v[1])
-	  		service["params"].push(v) 
+	  		if v.length > 1
+		  		if v[1].slice(-1) == "&"
+		  			v[1] = v[1][0..-2] 
+		  		end
+		  		v[1] = URI.encode_www_form_component(v[1])
+		  		service["params"].push(v)
+		  	else
+		  		service["params"].push(paramline)
+		  	end
 	  	end 
 	end
 
@@ -95,16 +99,20 @@ end
 def displayServices()
 	@services.each do |service|
 		#Iterate through the beacons to find any and all calls to the passed site and.or slug
-		puts "#{service["name"]}:\t 	 #{service["url"]}  "
-		puts "\t\tDOMAIN = #{service["domain"]}  "
-			
-		puts "\t\tSLUG = #{service["slug"]}  " if ! service["slug"].nil?
-		puts "\t\tQUERYSTRING = #{service["querystring"]} " if ! service["querystring"].nil?
+		displayService service
+	end
+end
 
-		if ! service["params"].nil?
-			service["params"].each do |param|
-				puts "\t\t\tParameter #{param[0]} =>  #{param[1]}"
-			end
+def displayService(service)
+	puts "#{service["name"]}:\t 	 #{service["url"]}  "
+	puts "\t\tDOMAIN = #{service["domain"]}  "
+		
+	puts "\t\tSLUG = #{service["slug"]}  " if ! service["slug"].nil?
+	puts "\t\tQUERYSTRING = #{service["querystring"]} " if ! service["querystring"].nil?
+
+	if ! service["params"].nil?
+		service["params"].each do |param|
+			puts "\t\t\tParameter #{param[0]} =>  #{param[1]}"
 		end
 	end
 end
@@ -120,7 +128,8 @@ def getParam(service, parameter)
 end
 
 def getParamValue(service_name, parameter)
-	if service == nil
+	service = getBeacon(service_name)
+	if service.nil?
 		msg = "No service named #{service_name} has been found yet"
 		print msg
 		step "I print out the list of services found"
@@ -129,10 +138,23 @@ def getParamValue(service_name, parameter)
 
 	param = getParam(service, parameter)
 	if param[0].nil?
-		  raise "#{service_name} exists but has no parameter #{param}"
+		msg = "#{service_name} exists but has no parameter #{param}"
+		puts msg
+		displayService service
 	end
 	param[0].should_not be nil
 
 	return param[1]
 end
 
+def countBeacons(url)
+	c = 0
+
+	@beacons.each do |beacon|
+		if beacon["url"].downcase.include? url
+			c = c+1
+		end
+	end
+	
+	return c
+end

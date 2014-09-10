@@ -23,17 +23,18 @@ Beacon Tester:
 	Be able to support the following paramater tests:
 		Beacon Calls:
 		- There will be a beacon call to a url of xxx	[required] @done(2014-09-10)
-		-	There will NOT be a call to a url of xxx	[excluded]
-		-	There will be n beacon calls to a url of xxx	[required n or more calls]
+		-	There will NOT be a call to a url of xxx	[excluded] @done(2014-09-10)
+		-	There will be n beacon calls to a url of xxx	[required n or more calls] @done(2014-09-10)
 		-	There could be a beacon call to a url of xxx [optional] @done(2014-09-10)
 
 		Parameters:
-		-	If the beacon call defining an optional service does not exist, skip the parameter tests
 		-	Parameter matches value @done(2014-09-10)
 		-	Parameter contains value @done(2014-09-10)
-		-	Parameter matches regular expression
-		-	Parameter has a value of {string, numeric, date}
+		-	Parameter matches regular expression @done(2014-09-10)
+		-	Parameter has a value of {string, numeric, date} @done(2014-09-10)
 		-	Be able to specify "a XXX parameter" or "an XXX parameter"
+
+		-	If the beacon call defining an optional service does not exist, skip the parameter tests
 
 		-	Omniture specific parameters:
 			- RSID
