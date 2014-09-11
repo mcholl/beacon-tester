@@ -1,3 +1,4 @@
+require 'uri'
 
 def captureTraffic()
 	@beacons = []			#all traffic stored here
@@ -41,6 +42,18 @@ def findBeacon?(service_name, service_url)
   return false
 end
 
+def if_beacon_exists(args, &block)
+	if @optionalbeacons.has_key?(args['service_name'])
+		#Optional Beacons make the test pass, but print out a warning message
+		puts "Warning: Optional Beacon for #{service_name} did not exist, so parameter value was not tested." 
+	else
+		service = getBeacon(args['service_name'])
+		actual_value = getParamValue(service_name, args['parameter'])
+
+		yield args, actual_value
+	end
+end
+
 def parseBeaconDetails(rawurl)
 
 	rawurl = URI.decode_www_form_component(rawurl)
@@ -66,7 +79,7 @@ def parseBeaconDetails(rawurl)
 
   	#parse out the slug (e.g. http://DOMAIN/slug?querystring)
   	if (service["domain"].length + service["querystring"].length) < service["url"].length
-  		service["slug"] = service["url"].clone[service["domain"].length ... -(service["querystring"].length)] #.../this/part/  to the first ? or the end
+  		service["slug"] = service["url"].clone[(service["domain"].length+7) ... -(service["querystring"].length+1)] #.../this/part/  to the first ? or the end
   	end
 
   	#parse out the params (e.g. http://DOMAIN/slug?querystringparam1=value&param2=valu2)
@@ -74,12 +87,14 @@ def parseBeaconDetails(rawurl)
 	  	service["params"] = []
 	  	 #parse the querystring at each "&", create a hash of key=value
 	  	service["querystring"].lines(separator="&").each do |paramline|
-	  		v = paramline.split("=")
+	  		v = paramline.split("=", 2)
+	  		param = v[0].clone
 	  		if v.length > 1
-		  		if v[1].slice(-1) == "&"
-		  			v[1] = v[1][0..-2] 
+		  		valus = v[1].clone
+		  		if valus.slice(-1) == "&"
+		  			valus = valus[0..-2] 
 		  		end
-		  		service["params"].push(v)
+		  		service["params"].push([param, valus])
 		  	else
 		  		service["params"].push(paramline)
 		  	end
@@ -141,11 +156,31 @@ def getParamValue(service_name, parameter)
 
 	param = getParam(service, parameter)
 	if param[0].nil?
-		msg = "#{service_name} exists but has no parameter #{param}"
+		msg = "#{service_name} exists but has no parameter #{parameter}"
 		puts msg
 		displayService service
 	end
 	param[0].should_not be nil
+
+	return param[1]
+end
+
+def getOmnitureValue(parameter)
+	service = getBeacon('Omniture')
+	param = getParam(service, parameter)
+	if param.nil?
+		return nil
+	end
+
+	#check to see if Omniture expansion is required
+	if param[1].include?("=")
+		expansion = param[1].split("=")
+		xp = getParam(service, expansion[1])
+		if xp.nil?
+			return param[1]
+		end
+		return xp[1].clone
+	end
 
 	return param[1]
 end
@@ -160,4 +195,29 @@ def countBeacons(url)
 	end
 	
 	return c
+end
+
+def checkParamType(type, actual_value)
+	if type.slice(0).downcase == "n"
+		#Verify that the paraameters value is numeric
+		# expect(actual_value).to be_kind_of(Numeric)
+		begin
+		   n = actual_value.to_f
+		rescue ArgumentError
+			puts "#{actual_value} is not in a recognized numeric format"
+			false.should be true
+		end
+
+	elsif type.slice(0).downcase == "d"
+		#Verify that the paraameters value is parseable as a date or time
+		begin
+		   Date.parse(actual_value)
+		rescue ArgumentError
+			puts "#{actual_value} is not in a recognized date format"
+			false.should be true
+		end
+	else
+		puts "'#{type}'  (#{type.slice(1).downcase}) is not a value type that I recognize.  Please specify 'numeric' or 'date'"
+		false.should be true
+	end
 end

@@ -1,7 +1,8 @@
 
 Given(/^I am on the home page at "(.*?)"$/) do |page_name|
+	page.driver.clear_network_traffic
 	visit page_name
-	sleep 15
+	sleep 40
 end
 
 When(/^I click on a "(.*?)" link$/) do |element|
