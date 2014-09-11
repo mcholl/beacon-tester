@@ -9,7 +9,7 @@ Scenario: Home Page will always fire Omniture and Chartbeat beacons
 
 	#Standard "Go to the page, save a screenshot, and collect traffic"
 	Given I am on the home page at "http://www.usatoday.com/" 
-	And I store a screenshot as "usatoday_com.png"
+	And I store a screenshot as "indystar_com.png"
 	When I collect all outgoing network traffic requests for 40000 milliseconds
 
 	#Optional Helper Function to show the network traffic

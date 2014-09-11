@@ -1,12 +1,19 @@
 Beacon Tester:
+	-	Share github repo with Joe Youngquist and Rob Klause
 
+	Refactor the Tests:
+	-	Structure the tests such that we get to the page in a setup scenario, then each beacon should be a separate scenario so that it can report the status of eah beacon correctly
+		This may entail the need to bring in VCR and WebMock.  The idea is that the background would read the traffic and record it. Each test can then play it back as needed.  Note also, I can differentiate between what I am doing now in "capturing" traffic and actually "recording" traffic.
+
+	- Implement a Values Table:
+		- Setup a table for 5 papers with default beacons
+		-	See that Cucumber executes it 5 times
+	
+	-	Plan out a basic matrix of sites, beacons, values to test
 
 	Define basic Scenarios to be run:
 		-	All Front Pages have the basic beacons: Omniture, Chartbeat, Double_Click, Comscrore
 			This scenario just hits the home page of each site an verifies the basic analytic tags all fire
-				- Implement a Values Table:
-					- Setup a table for 5 papers with default beacons
-					-	See taht Cucumber executes it 5 times
 
 		-	Subscription pages should have the following beacons: Marin
 			This scenario (which was the actual original requirement) verifies that a user can subscribe to the paper, and that the Marin Tag fires at the end of it with the correct parameters
@@ -21,7 +28,7 @@ Beacon Tester:
 		-	See what happens with a tag that does a POST. Per Rob, most of them are Gets, but we probably need POSTs too.
 
 	Be able to support the following paramater tests:
-		Beacon Calls:
+		- Beacon Calls: @done(2014-09-10)
 		- There will be a beacon call to a url of xxx	[required] @done(2014-09-10)
 		-	There will NOT be a call to a url of xxx	[excluded] @done(2014-09-10)
 		-	There will be n beacon calls to a url of xxx	[required n or more calls] @done(2014-09-10)
@@ -35,6 +42,7 @@ Beacon Tester:
 		-	Be able to specify "a XXX parameter" or "an XXX parameter"
 
 		-	If the beacon call defining an optional service does not exist, skip the parameter tests
+			Structure the "could be a becacon called" such that if it doesn't find the url, the service is added to a optionalbeacons{} map.  If the key exists in the map, then value comparisons are simply skipped.
 
 		-	Omniture specific parameters:
 			- RSID
@@ -42,6 +50,8 @@ Beacon Tester:
 
 	Be able to monitor the tags consistently:
 	-	Set up a Jenkins job to execute tests and notify XXX of any failures
+
+	Set up a CI server to run this:
 
 	Document it:
 

@@ -1,7 +1,8 @@
 
 def captureTraffic()
-	@beacons = []	#all traffic stored here
-	@services = []	#once a service has been identified, it is stored here
+	@beacons = []			#all traffic stored here
+	@services = []			#once a service has been identified, it is stored here
+	@optionalbeacons ={}	#map of optional beacons that were not found
 
 	# puts "Capturing network traffic at #{current_url}, with a timeout of #{page.driver.timeout}"
 	# puts page.driver.network_traffic.inspect
@@ -41,6 +42,9 @@ def findBeacon?(service_name, service_url)
 end
 
 def parseBeaconDetails(rawurl)
+
+	rawurl = URI.decode_www_form_component(rawurl)
+
 	service = Hash.new
   	service["url"] = rawurl.clone
 
@@ -75,7 +79,6 @@ def parseBeaconDetails(rawurl)
 		  		if v[1].slice(-1) == "&"
 		  			v[1] = v[1][0..-2] 
 		  		end
-		  		v[1] = URI.encode_www_form_component(v[1])
 		  		service["params"].push(v)
 		  	else
 		  		service["params"].push(paramline)

@@ -46,6 +46,7 @@ require 'date'
 	Then(/^there could be a "(.*?)" beacon call to "(.*?)"$/) do |service_name, service_url|
 		if !findBeacon?(service_name, service_url)
 			puts "Warning: There is no #{service_name} url of #{service_url}"
+			@optionalbeacons[service_name] = service_url
 		end
 	end
 
@@ -85,14 +86,29 @@ require 'date'
 # => Parameter Functions
 ###################################
 
+	#Verify Value Match
 	Then(/^"(.*?)" will have a "(.*?)" parameter with a value of "(.*?)"$/) do |service_name, parameter, expected_valu|
 		#Verify the beacon service has been named
+
+		if @optionalbeacons.has_key?(service_name)
+			#Optional Beacons make the test pass, but print out a warning message
+			puts "Warning: Optional Beacon for #{service_name} did not exist, so parameter value was not tested." 
+			break
+		end
+
 		service = getBeacon(service_name)
 		actual_value = getParamValue(service_name, parameter)
 		expect(actual_value).to eq(expected_valu)
 	end
 
+	#Verify Value doesn't Match
 	Then(/^"(.*?)" will have a "(.*?)" parameter that does not have a value of "(.*?)"$/) do |service_name, parameter, expected_valu|
+		if @optionalbeacons.has_key?(service_name)
+			#Optional Beacons make the test pass, but print out a warning message
+			puts "Warning: Optional Beacon for #{service_name} did not exist, so parameter value was not tested." 
+			break
+		end
+
 		service = getBeacon(service_name)
 		actual_value = getParamValue(service_name, parameter)
 		if actual_value.eql? expected_valu
@@ -101,8 +117,27 @@ require 'date'
 		end
 	end
 
+	#Verify Value Matches Regular Expression
+	Then(/^"(.*?)" will have a "(.*?)" parameter that matches the regular expression "(.*?)"$/) do |service_name, parameter, regex|
+		if @optionalbeacons.has_key?(service_name)
+			#Optional Beacons make the test pass, but print out a warning message
+			puts "Warning: Optional Beacon for #{service_name} did not exist, so parameter value was not tested." 
+			break
+		end
 
+		service = getBeacon(service_name)
+		actual_value = getParamValue(service_name, parameter)
+		expect(actual_value).to match(regex)
+	end
+
+	#Verify the type of the parameter
 	Then(/^"(.*?)" will have a "(.*?)" parameter with a "(.*?)" value$/) do |service_name, parameter_name, type|
+		if @optionalbeacons.has_key?(service_name)
+			#Optional Beacons make the test pass, but print out a warning message
+			puts "Warning: Optional Beacon for #{service_name} did not exist, so parameter value was not tested." 
+			break
+		end
+
 		service = getBeacon(service_name)
 		actual_value = getParamValue(service_name, parameter_name)
 
@@ -127,24 +162,31 @@ require 'date'
 		else
 			puts "'#{type}'  (#{type.slice(1).downcase}) is not a value type that I recognize.  Please specify 'numeric' or 'date'"
 			false.should be true
-		end
-	  	
+		end  	
 	end
 
-	Then(/^"(.*?)" will have a "(.*?)" parameter that matches the regular expression "(.*?)"$/) do |service_name, parameter, regex|
-		service = getBeacon(service_name)
-		actual_value = getParamValue(service_name, parameter)
-		expect(actual_value).to match(regex)
-	end
-
+	#Very incomplete match
 	Then(/^"(.*?)" will have a "(.*?)" parameter that contains the term "(.*?)"$/) do |service_name, parameter, expected_valu|
+		if @optionalbeacons.has_key?(service_name)
+			#Optional Beacons make the test pass, but print out a warning message
+			puts "Warning: Optional Beacon for #{service_name} did not exist, so parameter value was not tested." 
+			break
+		end
+
 		service = getBeacon(service_name)
 		actual_value = getParamValue(service_name, parameter)
 
 		expect(actual_value.include? expected_valu).to be true
 	end
 
+	#Verify no incomplete match
 	Then(/^"(.*?)" will have a "(.*?)" parameter that does not contain the term "(.*?)"$/) do |service_name, parameter, expected_valu|
+		if @optionalbeacons.has_key?(service_name)
+			#Optional Beacons make the test pass, but print out a warning message
+			puts "Warning: Optional Beacon for #{service_name} did not exist, so parameter value was not tested." 
+			break
+		end
+		
 		service = getBeacon(service_name)
 		actual_value = getParamValue(service_name, parameter)
 
